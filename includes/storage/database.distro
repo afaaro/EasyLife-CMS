@@ -1,0 +1,181 @@
+SET sql_mode = '';
+
+DROP TABLE IF EXISTS `#__content`;
+CREATE TABLE `#__content` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `controller` varchar(255) NOT NULL,
+  `type` enum('PLUGIN','STATIC','INTERNAL','REDIRECT') NOT NULL DEFAULT 'PLUGIN',
+  `showtitle` tinyint(1) NOT NULL DEFAULT '1',
+  `meta_keywords` text NOT NULL,
+  `meta_description` text NOT NULL,
+  `content` longtext NOT NULL,
+  `cont_before` longtext NOT NULL,
+  `cont_after` longtext NOT NULL,
+  `options` longtext NOT NULL,
+  `roles` text NOT NULL,
+  `sitemap` tinyint(1) NOT NULL DEFAULT '1',
+  `rss` tinyint(1) NOT NULL DEFAULT '0',
+  `searchable` tinyint(1) NOT NULL DEFAULT '0',
+  `acp` enum('yes','no') NOT NULL DEFAULT 'no',
+  `status` enum('active','acp','inactive') NOT NULL DEFAULT 'inactive',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `type` (`type`)
+) ENGINE=MyISAM  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+INSERT INTO `#__content` VALUES(1, 'User', 'user', 'user', 'PLUGIN', 1, '', '', '', '', '', 'a:1:{s:6:\"layout\";a:2:{s:3:\"nav\";i:1;s:5:\"extra\";i:1;}}', '', 1, 0, 0, 'yes', 'active');
+INSERT INTO `#__content` VALUES(2, 'Language', 'language', 'language', 'PLUGIN', 1, '', '', '', '', '', '', '', 1, 0, 0, 'yes', 'acp');
+INSERT INTO `#__content` VALUES(3, 'Configuration', 'configuration', 'configuration', 'PLUGIN', 1, '', '', '', '', '', '', '', 1, 0, 0, 'yes', 'acp');
+INSERT INTO `#__content` VALUES(4, 'Plugins', 'plugins', 'plugins', 'PLUGIN', 1, '', '', '', '', '', '', '', 1, 0, 0, 'yes', 'acp');
+INSERT INTO `#__content` VALUES(5, 'Dashboard', 'dashboard', 'dashboard', 'PLUGIN', 1, '', '', '', '', '', '', '', 1, 0, 0, 'yes', 'acp');
+
+DROP TABLE IF EXISTS `#__configuration`;
+CREATE TABLE `#__configuration` (
+  `label` varchar(255) NOT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY (`label`)
+) ENGINE=MyISAM  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+DROP TABLE IF EXISTS `#__user`;
+CREATE TABLE `#__user` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `username` varchar(100) NOT NULL,
+  `password` text NOT NULL,
+  `email` varchar(140) NOT NULL,
+  `regdate` datetime DEFAULT NULL,
+  `real_name` varchar(140) NOT NULL,
+  `user_level` tinyint(4) NOT NULL DEFAULT '-101',
+  `user_rights` text NOT NULL,
+  `lastseen` datetime DEFAULT NULL,
+  `lastip` varchar(15) NOT NULL DEFAULT '',
+  `cookiesalt` varchar(255) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `status` enum('active','inactive','waiting','moderate') NOT NULL DEFAULT 'inactive',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=MyISAM  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+DROP TABLE IF EXISTS `#__user_group`;
+CREATE TABLE `#__user_group` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `user_level` tinyint(4) NOT NULL,
+  `label` varchar(255) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `permission` longtext NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+INSERT INTO `#__user_group` (`id`, `user_level`, `label`, `title`, `permission`) VALUES
+(1, '103', 'SUPERADMIN', 'Super Admin', '{"access":["advertisement/advertisement","advertisement/client","configuration/configuration","configuration/language","dashboard/boxes/comments","dashboard/boxes/quickicons","dashboard/boxes/quicknote","dashboard/dashboard","plugins/menu","plugins/menuacp","plugins/option","plugins/plugins","plugins/static","post/ajax","post/audio","post/category","post/news","user/user","user/user_group"],"modify":["advertisement/advertisement","advertisement/client","configuration/configuration","configuration/language","dashboard/boxes/comments","dashboard/boxes/quickicons","dashboard/boxes/quicknote","dashboard/dashboard","plugins/menu","plugins/menuacp","plugins/option","plugins/plugins","plugins/static","post/ajax","post/audio","post/category","post/news","user/user","user/user_group"],"delete":["advertisement/advertisement","advertisement/client","configuration/configuration","configuration/language","dashboard/boxes/comments","dashboard/boxes/quickicons","dashboard/boxes/quicknote","dashboard/dashboard","plugins/menu","plugins/menuacp","plugins/option","plugins/plugins","plugins/static","post/ajax","post/audio","post/category","post/news","user/user","user/user_group"]}'),
+(2, '102', 'ADMIN', 'Administrator', ''),
+(3, '101', 'REGISTERED', 'Registered', ''),
+(4, '0', 'GUEST', 'Guest', '');
+
+--
+-- Table structure for table `#__user_levels`
+--
+
+DROP TABLE IF EXISTS `#__user_levels`;
+CREATE TABLE IF NOT EXISTS `#__user_levels` (
+  `user_level_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_level_name` varchar(100) NOT NULL,
+  `user_level_active` enum('yes','no') NOT NULL DEFAULT 'yes',
+  PRIMARY KEY (`user_level_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `#__user_levels`
+--
+
+INSERT INTO `#__user_levels` VALUES(1, 'Super Administrator', 'yes');
+INSERT INTO `#__user_levels` VALUES(2, 'Administrator', 'yes');
+INSERT INTO `#__user_levels` VALUES(3, 'Moderator', 'yes');
+INSERT INTO `#__user_levels` VALUES(4, 'Registered', 'yes');
+INSERT INTO `#__user_levels` VALUES(5, 'Guest', 'yes');
+
+--
+-- Table structure for table `#__user_levels_permissions`
+--
+
+DROP TABLE IF EXISTS `#__user_levels_permissions`;
+CREATE TABLE IF NOT EXISTS `#__user_levels_permissions` (
+  `user_level_permission_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_level_id` int(11) NOT NULL,
+  `create_any` enum('1','0') NOT NULL DEFAULT '0',
+  `modify_own` enum('1','0') NOT NULL DEFAULT '0',
+  `modify_any` enum('1','0') NOT NULL DEFAULT '0',
+  `delete_own` enum('1','0') NOT NULL DEFAULT '0',
+  `delete_any` enum('1','0') NOT NULL DEFAULT '0',
+  `view` enum('1','0') NOT NULL DEFAULT '1',
+  `controller` varchar(255) NOT NULL,
+  PRIMARY KEY (`user_level_permission_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `#__user_login_flood`;
+CREATE TABLE `#__user_login_flood` (
+  `ip` varchar(15) NOT NULL DEFAULT '',
+  `time` datetime NOT NULL,
+  `attempts` int(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ip`)
+) ENGINE=MyISAM  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+DROP TABLE IF EXISTS `#__user_online`;
+CREATE TABLE `#__user_online` (
+  `ip` varbinary(32) NOT NULL,
+  `uid` int(10) NOT NULL,
+  `guest` tinyint(1) NOT NULL,
+  `date` datetime NOT NULL,
+  PRIMARY KEY (`ip`)
+) ENGINE=MyISAM  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+DROP TABLE IF EXISTS `#__log`;
+CREATE TABLE `#__log` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `label` varchar(20) NOT NULL,
+  `message` longtext NOT NULL,
+  `ip` varbinary(32) NOT NULL,
+  `time` datetime NOT NULL,
+  `uniqueid` varchar(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniqueid` (`uniqueid`)
+) ENGINE=MyISAM  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+DROP TABLE IF EXISTS `#__menu`;
+CREATE TABLE `#__menu` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `zone` enum('nav','head') NOT NULL DEFAULT 'nav',
+  `position` tinyint(3) NOT NULL,
+  `roles` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+DROP TABLE IF EXISTS `#__menu_acp`;
+CREATE TABLE `#__menu_acp` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `rights` varchar(50) NOT NULL,
+  `uniqueid` varchar(255) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `icon` char(34) NOT NULL DEFAULT 'docs.png',
+  `menu` enum('system','content','security') NOT NULL DEFAULT 'content',
+  `parent` int(11) NOT NULL DEFAULT '0',
+  `status` enum('active','inactive') NOT NULL DEFAULT 'inactive',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+INSERT INTO `#__menu_acp` VALUES(1, 'System', '', '', '', 'fa-cog', 'system', 0, 'active');
+INSERT INTO `#__menu_acp` VALUES(2, 'Menu editor', '', '', 'plugins/menu', 'content.png', 'system', 1, 'active');
+INSERT INTO `#__menu_acp` VALUES(3, 'Plugins and pages', '', '', 'plugins/plugins', 'plugins.png', 'system', 1, 'active');
+INSERT INTO `#__menu_acp` VALUES(4, 'Site configuration', '', '', 'configuration/configuration', 'settings.png', 'system', 1, 'active');
+INSERT INTO `#__menu_acp` VALUES(5, 'Users', 'user', '', '', 'user.png', 'system', 1, 'active');
+INSERT INTO `#__menu_acp` VALUES(6, 'Content', 'content', '', '', 'fa-tasks', 'content', 0, 'active');
+INSERT INTO `#__menu_acp` VALUES(7, 'Security', '', '', '', 'fa-shield', 'security', 0, 'active');
+INSERT INTO `#__menu_acp` VALUES(8, 'MultiLanguage', '', '', 'configuration/language', 'settings.png', 'system', 1, 'active');
+INSERT INTO `#__menu_acp` VALUES(9, 'Menu editor (AdminCP)', '', '', 'plugins/menuacp', 'content.png', 'system', 1, 'active');
+INSERT INTO `#__menu_acp` VALUES(10, 'User', 'user', '', 'user/user', 'docs.png', 'system', 5, 'active');
+INSERT INTO `#__menu_acp` VALUES(11, 'User Group', 'user', '', 'user/user_group', 'docs.png', 'system', 5, 'active');
