@@ -42,6 +42,23 @@ class userController {
 			}
 		} else {
 			// List User
+			opentable("<a href='".Url::link('user/user_group&amp;ref=form')."' data-toggle='tooltip' title='Add Group' class='btn btn-default btn-xs'><i class='fa fa-plus'></i></a>");
+			echo "<div class='dd'><ol class='dd-list'>";
+			foreach($db->select('#__user') as $row) {			
+				echo "<li class='dd-item' data-id='".$row['id']."'>";
+				echo "<div class='dd-handle'></div>";
+				echo "<div class='dd-content'>";
+					echo "<b>ID:{$row['id']}</b>&nbsp;&nbsp;";
+					echo Io::Output($row['username']);
+					echo "<div class='pull-right'>";
+						echo "<a href='".Url::link('user/user_group&amp;ref=form&amp;id='.Io::Output($row['id']))."' class='btn btn-primary btn-xs'>Edit Group</a>&nbsp;&nbsp;";
+						echo "<a href='".Url::link('user/user_permission&amp;id='.Io::Output($row['id']))."' class='btn btn-primary btn-xs'>Edit Permissions</a>&nbsp;&nbsp;";
+						echo "<a href='".Url::link('user/user_group&amp;ref=delete&amp;id='.Io::Output($row['id']))."' class='btn btn-danger btn-xs'><i title='Delete' alt='Delete' class='fa fa-remove text-danger'></i></a>";
+					echo "</div>";
+				echo "</div>";
+			}
+			echo "</ol></div>";
+			closetable();
 		}
 	}
 }
